@@ -1,5 +1,6 @@
 package coastline;
 
+import tools.*;
 import java.awt.geom.Point2D;
 import java.util.*;
 import java.awt.Point;
@@ -7,6 +8,18 @@ import java.awt.Point;
 public class CoastLine implements Iterable<Point2D>
 {
 	private List<Point2D> coastline;
+	private static int defaultDrawHeight = 400;
+	private static int defaultDrawWidth = 400;
+
+	public CoastLine() 
+	{
+		this.coastline = new ArrayList<Point2D>(); 
+	}
+
+	public CoastLine(List<Point2D> cl)
+	{
+		this.coastline = cl;
+	}
 
 	public int getNumberOfPoints()
 	{
@@ -15,11 +28,36 @@ public class CoastLine implements Iterable<Point2D>
 
 	public void draw()
 	{
-		CoastLineViewController clvc = new CoastLineViewController(new CoastLineComponent(this));
-		clvc.display();
-
+		CoastLine.draw(this);
 	}
 
+	public void draw(int centreIndex, double zoom)
+	{
+		double x = this.coastline.get(centreIndex).getX();
+		double y = this.coastline.get(centreIndex).getY();
+
+		System.out.print(x);
+		System.out.print("   ");
+		System.out.println(y);
+
+		double plusX = CoastLine.defaultDrawWidth  / 2 - x * zoom;
+		double plusY = CoastLine.defaultDrawHeight / 2 - y * zoom;
+
+		List<Point2D> zoomedCL = new ArrayList<Point2D>();
+		for (Point2D pt : this.coastline)
+		{
+			zoomedCL.add(new Point2D.Double(pt.getX() * zoom + plusX, pt.getY() * zoom + plusY));
+		}
+
+		CoastLine.draw(new CoastLine(zoomedCL));
+	}	
+
+	public static void draw(CoastLine cl)
+	{
+		CoastLineViewController clvc = new CoastLineViewController(
+									   new CoastLineComponent(cl, CoastLine.defaultDrawWidth, CoastLine.defaultDrawHeight));
+		clvc.display();
+	}
 
 	public Iterator<Point2D> iterator()
 	{
@@ -40,11 +78,10 @@ public class CoastLine implements Iterable<Point2D>
 			coastline.remove(pierEndIndex);
 		}
 		
-		double deltaXParallel = this.coastline.get(pierEndIndex).getX() - this.coastline.get(pierStartIndex).getX();
-		double deltaYParallel = this.coastline.get(pierEndIndex).getY() - this.coastline.get(pierStartIndex).getY();		
-		double truePierWidth = Math.sqrt(Math.pow(deltaXParallel, 2) + Math.pow(deltaYParallel, 2));
-		deltaXParallel /= truePierWidth;
-		deltaYParallel /= truePierWidth;
+		Point2D parallelUnitVector = PointTools.getUnitVector(this.coastline.get(pierStartIndex), this.coastline.get(pierEndIndex));
+		double deltaXParallel = parallelUnitVector.getX();
+		double deltaYParallel = parallelUnitVector.getY();		
+
 		double deltaXPerpendicular = deltaYParallel;
 		double deltaYPerpendicular = -1 * deltaXParallel;
 
@@ -63,15 +100,15 @@ public class CoastLine implements Iterable<Point2D>
 		Point2D last;
 		for ( ; i < startingIndex + (int)(length / resolution); i++)
 		{
-			System.out.print(i);
-			System.out.print("   ");
-			System.out.println(startingIndex + (int)(length / resolution));
+
 			last = this.coastline.get(i-1);
 			this.coastline.add(i, new Point2D.Double(last.getX() + deltaX * resolution, last.getY() + deltaY * resolution));
 		}
 
 		return i;
 	}
+
+
 
 
 }
