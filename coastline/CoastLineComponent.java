@@ -9,7 +9,10 @@ import java.awt.geom.Point2D;
 
 import javax.swing.JComponent;
 
-
+/**************************************************************************
+* Class: CoastLineCompnent
+* A class used to draw a CoastLine.
+**************************************************************************/
 
 public class CoastLineComponent extends JComponent
 {
@@ -31,11 +34,6 @@ public class CoastLineComponent extends JComponent
         this.setPreferredSize(new Dimension(width,height));
     }
 
-    public void fit()
-    {
-
-    }
-
     public void paintComponent(Graphics g) 
     {
         g.setColor(Color.white);
@@ -51,11 +49,9 @@ public class CoastLineComponent extends JComponent
             if (ptLast != null)
             {
                 g2.draw(new Line2D.Double(ptLast.getX(), ptLast.getY(), pt.getX(), pt.getY()));
-
             }
 
             ptLast = pt;
-
         }
     }
 }

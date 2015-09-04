@@ -4,6 +4,13 @@ import java.awt.geom.Point2D;
 
 public class PointTools
 {
+
+	/**************************************************************************
+	* Function: getUnitVector(Point2D p1, Point2D p2)
+	* Takes 2 points and return a sinle point representing a vector pointing 
+	* from p1 to p2 with a length of 1.
+	*
+	**************************************************************************/
 	public static Point2D getUnitVector(Point2D p1, Point2D p2)
 	{
 		double deltaX = p2.getX() - p1.getX();

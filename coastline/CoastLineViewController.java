@@ -3,6 +3,11 @@ package coastline;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+/**************************************************************************
+* Class: CoastLineCompnent
+* Creates the window where the CoastLineComponent is shown.
+**************************************************************************/
+
 class CoastLineViewController implements Runnable
 {
     private CoastLineComponent clc;
