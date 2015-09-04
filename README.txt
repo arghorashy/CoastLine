@@ -5,7 +5,7 @@ to downsample a detailed shoreline, so that it can be rendered more easily.  How
 satisfied as I wanted to see how it worked.  As a result, I ended up writing a bunch of other functions / classes so that
 I could understand / debug / visualise what my program was doing.
 
-I don't want you to have to dig around all the code though, so here is all you really need to know:
+Obviously, I don't want you to have to dig around all the code though, so here is all you really need to know:
 
 - I made a class called CoastLine.  You can import it into your own program and use it.
 - This class basically contains an ArrayList of points which defines a coastline (much like we discussed).

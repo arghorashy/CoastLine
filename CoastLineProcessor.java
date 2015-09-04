@@ -63,11 +63,11 @@ public class CoastLineProcessor
 		System.out.println("Only when zoomed in does the difference become more apparent.\n");
 		pressAnyKeyToContinue();
 
-		CoastLine new2CL = cl.subsample(0.1);
+		CoastLine new2CL = cl.subsample(0.3);
 		num = new2CL.getNumberOfPoints();
 		new2CL.draw();
-		System.out.println("Further savings can be had by reapplying the algorithm. This plot only has");
-		System.out.println(num + " points.\n");
+		System.out.println("Further savings can be had by applying the algorithm more aggressively. ");
+		System.out.println("This plot only has " + num + " points.\n");
 		pressAnyKeyToContinue();
 
 	}
@@ -84,7 +84,7 @@ public class CoastLineProcessor
 
 		while (true)
 		{
-			System.out.println("Select a command: cp, function, draw, show_mem, exit:");
+			System.out.println("Select a command: cp, function, draw, show_mem, help, exit:");
 
 			String cmd = reader.next();
 			if (cmd.equals("cp"))
@@ -102,6 +102,10 @@ public class CoastLineProcessor
 				String newName = reader.next();
 
 				mem.put(newName, new CoastLine(mem.get(clName)));
+			}
+			if (cmd.equals("help"))
+			{
+				showPromptHelp();
 			}
 			else if (cmd.equals("function"))
 			{
@@ -198,7 +202,7 @@ public class CoastLineProcessor
 
 				double zoom = reader.nextDouble();
 
-				if (zoom < 0)
+				if (zoom <= 0)
 				{
 					System.out.println("Zoom must be positive.");
 					continue;		
@@ -257,18 +261,19 @@ public class CoastLineProcessor
 		System.out.println("");
 		System.out.println("Command Descriptions");
 		System.out.println("--------------------");
-		System.out.println("cp 		 - A coastline from one name in memory to another.");
+		System.out.println("cp       - A coastline from one name in memory to another.");
 		System.out.println("function - Process a coastline in memory in-place.");
 		System.out.println("draw 	 - Draw a coastline in memory.");
 		System.out.println("show_mem - Show the coastlines currently in memory.");
 		System.out.println("           Always starts with \"init\" defined.");
+		System.out.println("help     - Show this.");
 		System.out.println("exit 	 - Quit the program.");
 		System.out.println("");
 	}
 
 	private static void pressAnyKeyToContinue()
 	{ 
-        System.out.println("Press any key to continue...");
+        System.out.println("Press enter to continue...");
         try
         {
             System.in.read();

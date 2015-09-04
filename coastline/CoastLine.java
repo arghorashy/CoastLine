@@ -206,7 +206,7 @@ public class CoastLine implements Iterable<Point2D>
 	* necessary to find the point where the first condition goes from being
 	* satisified to unsastisifed.
 	*
-	* To find this breaking point, an exponential search is followed by a 
+	* To find this breaking point, an exponential search is used, then a 
 	* binary search.
 	**************************************************************************/
 	public CoastLine subsample(double accuracy)
@@ -295,7 +295,7 @@ public class CoastLine implements Iterable<Point2D>
 	* This function takes a window radius and, for each point, recalculates its
 	* position based on the average position of all the points within the window.
 	*
-	* This was the first idea, but its slow, mildy effective and is not very
+	* This was the first idea, but it's slow, mildy effective and is not very
 	* good at reducing the point count.
 	**************************************************************************/
 	public CoastLine windowSmoothing(double radius)
