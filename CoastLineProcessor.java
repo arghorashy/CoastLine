@@ -8,8 +8,18 @@ public class CoastLineProcessor
 {
 	public static void main(String args[])
 	{
-		//demo();
-		inputProcessor();
+		Scanner reader = new Scanner(System.in);
+		String cmd;
+		while(true)
+		{
+			System.out.println("Choose: \"demo\" or \"prompt\"");
+			cmd = reader.next();
+
+			if (cmd.equals("demo")) demo();
+			else if (cmd.equals("prompt")) prompt();
+			else System.out.println("Invalid command!");
+		}
+		
 
 	}
 
@@ -17,50 +27,50 @@ public class CoastLineProcessor
 	{
 		TestCoastLine cl = new TestCoastLine();
 		cl.draw(100 * 1000, 10);
-		//CoastLine newCL = CoastLine.windowSmoothing(cl, 0.75);
-		CoastLine newCL = CoastLine.subsample(cl, 0.5);
+		//CoastLine newCL = cl.windowSmoothing(0.75);
+		CoastLine newCL = cl.subsample(0.5);
 		newCL.draw();
 	}
 
-	public static void inputProcessor()
+	public static void prompt()
 	{
 		Map<String, CoastLine> mem = new HashMap<String, CoastLine>();
-		mem.put("init", new TestCoastLine());
+		mem.put("init", new TestCoastLine(0.001, 0.001));
 		Scanner reader = new Scanner(System.in);
 
 		while (true)
 		{
-			System.out.println("\nSelect a command: cp, function, draw, show_mem, exit:");
+			System.out.println("Select a command: cp, function, draw, show_mem, exit:");
 
 			String cmd = reader.next();
 			if (cmd.equals("cp"))
 			{
-				System.out.println("\nChoose a coastline to copy:\n" + listMemory(mem));
+				System.out.println("Choose a coastline to copy:\n" + listMemory(mem));
 				String clName = reader.next();
 
 				if (! mem.containsKey(clName))
 				{
-					System.out.println("\nThat name is not defined!");
+					System.out.println("That name is not defined!");
 					continue;
 				}
 
-				System.out.println("\nChoose a destination name:");
+				System.out.println("Choose a destination name:");
 				String newName = reader.next();
 
 				mem.put(newName, new CoastLine(mem.get(clName)));
 			}
 			else if (cmd.equals("function"))
 			{
-				System.out.println("\nChoose a coastline to process:\n" + listMemory(mem));
+				System.out.println("Choose a coastline to process:\n" + listMemory(mem));
 				String clName = reader.next();
 
 				if (! mem.containsKey(clName))
 				{
-					System.out.println("\nThat name is not defined!");
+					System.out.println("That name is not defined!");
 					continue;
 				}
 
-				System.out.println("\nChoose a function:\n" 
+				System.out.println("Choose a function:\n" 
 						+ "\tsubsample\n"
 						+ "\twindow\n");
 
@@ -68,11 +78,11 @@ public class CoastLineProcessor
 
 				if (function.equals("subsample"))
 				{
-					System.out.println("\nHow much accuracy? (Can be decimal.  Smaller means less subsampling.):");
+					System.out.println("How much accuracy? (Can be decimal.  Smaller means less subsampling.):");
 
 					if (! reader.hasNextDouble())
 					{
-						System.out.println("\nThat's not a valid decimal number!");
+						System.out.println("That's not a valid decimal number!");
 						continue;	
 					}
 
@@ -80,19 +90,19 @@ public class CoastLineProcessor
 
 					if (accuracy < 0)
 					{
-						System.out.println("\nAccuracy must be positive.");
+						System.out.println("Accuracy must be positive.");
 						continue;		
 					}
 
-					mem.put(clName, CoastLine.subsample(mem.get(clName), accuracy));
+					mem.put(clName, mem.get(clName).subsample(accuracy));
 				}
 				else if (function.equals("window"))
 				{
-					System.out.println("\nWindow radius? (Can be decimal.  Smaller is less smoothing):");
+					System.out.println("Window radius? (Can be decimal.  Smaller is less smoothing):");
 
 					if (! reader.hasNextDouble())
 					{
-						System.out.println("\nThat's not a valid decimal number!");
+						System.out.println("That's not a valid decimal number!");
 						continue;	
 					}
 
@@ -100,27 +110,27 @@ public class CoastLineProcessor
 
 					if (radius < 0)
 					{
-						System.out.println("\nRadius must be positive.");
+						System.out.println("Radius must be positive.");
 						continue;		
 					}
 
-					mem.put(clName, CoastLine.windowSmoothing(mem.get(clName), radius));
+					mem.put(clName, mem.get(clName).windowSmoothing(radius));
 
 				}
 
 			}
 			else if (cmd.equals("draw"))
 			{
-				System.out.println("\nChoose a coastline to draw:\n" + listMemory(mem));
+				System.out.println("Choose a coastline to draw:\n" + listMemory(mem));
 				String clName = reader.next();
 				
 				if (! mem.containsKey(clName))
 				{
-					System.out.println("\nThat name is not defined!");
+					System.out.println("That name is not defined!");
 					continue;
 				}
 
-				System.out.println("\nZoom? (y/n):");
+				System.out.println("Zoom? (y/n):");
 				String yn = reader.next();
 
 				if (yn.equals("n"))
@@ -130,15 +140,15 @@ public class CoastLineProcessor
 				}
 				else if (! yn.equals("y"))
 				{
-					System.out.println("\nThat's not a valid response!");
+					System.out.println("That's not a valid response!");
 					continue;	
 				}
 
-				System.out.println("\nHow much zoom? (Can be a decimal):");
+				System.out.println("How much zoom? (Can be a decimal):");
 
 				if (! reader.hasNextDouble())
 				{
-					System.out.println("\nThat's not a valid decimal number!");
+					System.out.println("That's not a valid decimal number!");
 					continue;	
 				}
 
@@ -146,16 +156,16 @@ public class CoastLineProcessor
 
 				if (zoom < 0)
 				{
-					System.out.println("\nZoom must be positive.");
+					System.out.println("Zoom must be positive.");
 					continue;		
 				}
 
 				int maxIndex = mem.get(clName).getNumberOfPoints();
-				System.out.println("\nWhere should be drawing be centred? (Must be int between 0 and " + maxIndex + ".):");
+				System.out.println("Where should be drawing be centred? (Must be int between 0 and " + maxIndex + ".):");
 
 				if (! reader.hasNextInt())
 				{
-					System.out.println("\nThat's not a valid integer!");
+					System.out.println("That's not a valid integer!");
 					continue;	
 				}
 
@@ -163,7 +173,7 @@ public class CoastLineProcessor
 
 				if (centre < 0 || centre > maxIndex)
 				{
-					System.out.println("\nSpecified centre out of range.");
+					System.out.println("Specified centre out of range.");
 					continue;		
 				}
 
@@ -172,7 +182,7 @@ public class CoastLineProcessor
 			}
 			else if (cmd.equals("show_mem"))
 			{
-				System.out.println("\nNames used in memory:\n" + listMemory(mem));
+				System.out.println("Names used in memory:\n" + listMemory(mem));
 			}
 			else if (cmd.equals("exit"))
 			{
@@ -180,7 +190,7 @@ public class CoastLineProcessor
 			}
 			else
 			{
-				System.out.println("\nInvalid command: Try again!");
+				System.out.println("Invalid command: Try again!");
 			}
 		}
 	}

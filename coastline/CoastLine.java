@@ -34,6 +34,18 @@ public class CoastLine implements Iterable<Point2D>
 		this.coastline = cl;
 	}
 
+	public CoastLine(double[][] points)
+	{
+		this();
+		if (points.length > 0 && points[0].length == 2)
+		{
+			for (double[] point : points)
+			{
+				this.coastline.add(new Point2D.Double(point[0], point[1]));
+			}
+		}
+	}
+
 	public int getNumberOfPoints()
 	{
 		return this.coastline.size();
@@ -136,6 +148,7 @@ public class CoastLine implements Iterable<Point2D>
 
 		int currentIndex = pierStartIndex + 1;
 
+
 		// Insert points going out from the shore to make one side of the pier.
 		currentIndex = this.addLine(currentIndex, deltaXPerpendicular, deltaYPerpendicular, 
 												  pierLength, resolution);
@@ -161,18 +174,20 @@ public class CoastLine implements Iterable<Point2D>
 	{
 		int i = startingIndex;
 		Point2D last;
-		for ( ; i < startingIndex + (int)(length / resolution); i++)
+
+		for ( ; i <= startingIndex + (int)(length / resolution); i++)
 		{
 			last = this.coastline.get(i-1);
 			this.coastline.add(i, new Point2D.Double(last.getX() + deltaX * resolution, 
 											         last.getY() + deltaY * resolution));
 		}
 
+
 		return i;
 	}
 
 	/**************************************************************************
-	* Function: subsample(CoastLine cl, double accuracy)
+	* Function: subsample(double accuracy)
 	* This function removes shoreline details and reduces the number of points 
 	* needed to accurately represent a shoreline.
 	*
@@ -184,6 +199,9 @@ public class CoastLine implements Iterable<Point2D>
 	* 	- skipping point B and including the next point instead would cause 
 	*     the first condition to be violated.
 	*
+	* The idea here is that the more points one tries to skip, the more liekly 
+	* the approximate line will be far from the points that are being skipped.
+	*
 	* Therefore, to exclude the most number of points possible, it is
 	* necessary to find the point where the first condition goes from being
 	* satisified to unsastisifed.
@@ -191,15 +209,15 @@ public class CoastLine implements Iterable<Point2D>
 	* To find this breaking point, an exponential search is followed by a 
 	* binary search.
 	**************************************************************************/
-	public static CoastLine subsample(CoastLine cl, double accuracy)
+	public CoastLine subsample(double accuracy)
 	{
 		CoastLine newCL = new CoastLine();
 
 		// Always take the first point
-		newCL.add(cl.coastline.get(0));
+		newCL.add(this.coastline.get(0));
 
 		// For each point selected, now choose the next point to be taken
-		for (int i = 0; i < cl.getNumberOfPoints(); i++)
+		for (int i = 0; i < this.getNumberOfPoints() - 1; )
 		{
 			// min and max will determine the range for the later binary search
 			// for now, use an exponential search to find the abovementioned
@@ -212,14 +230,14 @@ public class CoastLine implements Iterable<Point2D>
 				// Note: Each min value is a previous max value
 				max = i + (int)Math.pow(2, count);
 				min = i + (int)Math.pow(2, count - 1);
-				if (max >= cl.getNumberOfPoints()) 
+				if (max >= this.getNumberOfPoints()) 
 				{
-					max = cl.getNumberOfPoints() - 1;
+					max = this.getNumberOfPoints() - 1;
 					break;
 				}
 
-				Line2D line = new Line2D.Double(cl.coastline.get(i), cl.coastline.get(max));
-				boolean outOfRange = CoastLine.arePointsInRange(cl, line, i + 1, max - 1, accuracy);
+				Line2D line = new Line2D.Double(this.coastline.get(i), this.coastline.get(max));
+				boolean outOfRange = this.arePointsOutOfRange(line, i + 1, max - 1, accuracy);
 
 				// If the points between i and max are not within "accuracy" of the line between
 				// i and max, we know that the breaking point is somewhere between min and max
@@ -227,39 +245,44 @@ public class CoastLine implements Iterable<Point2D>
 				else count ++;
 			}
 
-			// Now, use binary search to find the breaking point
-			while (min < max)
+			// If max is i + 2 and min is i + 1, and i + 2 is not admissible, then no
+			// need for binary search
+			if (count > 1)
 			{
-				int mid = (min + max) / 2;
+				// Now, use binary search to find the breaking point
+				while (min < max)
+				{
+					int mid = (min + max) / 2;
 
-				Line2D line = new Line2D.Double(cl.coastline.get(i), cl.coastline.get(mid));
-				boolean outOfRange = CoastLine.arePointsInRange(cl, line, i + 1, mid - 1, accuracy);
+					Line2D line = new Line2D.Double(this.coastline.get(i), this.coastline.get(mid));
+					boolean outOfRange = this.arePointsOutOfRange(line, i + 1, mid - 1, accuracy);
 
-				if (outOfRange) max = mid - 1;
-				else min = mid + 1;
+					if (outOfRange) max = mid;
+					else min = mid + 1;
+				}
 			}
 
 			// Add the found point and use this point as the basis for looking
 			// for the next point
 			i = Math.min(min, max);
-			newCL.add(cl.coastline.get(i));
+			newCL.add(this.coastline.get(i));
 		}
 		return newCL;
 
 	}
 
 	/**************************************************************************
-	* Function: arePointsInRange(CoastLine cl, Line2D line, int ptsStartInd, 
-										       int ptsEndInd, double tolerance)
+	* Function: arePointsOutOfRange(Line2D line, int ptsStartInd, 
+								 	int ptsEndInd, double tolerance)
 	* Determines whether the points between ptsStartInd and ptsEndInd are within
 	* "tolerance" of line.
 	**************************************************************************/
-	private static boolean arePointsInRange(CoastLine cl, Line2D line, 
-		                  int ptsStartInd, int ptsEndInd, double tolerance)
+	private boolean arePointsOutOfRange(Line2D line, int ptsStartInd, 
+										int ptsEndInd, double tolerance)
 	{
-		for (int k = ptsStartInd; k < ptsEndInd; k++)
+		for (int k = ptsStartInd; k <= ptsEndInd; k++)
 		{
-			if (line.ptLineDist(cl.coastline.get(k)) > tolerance)
+			if (line.ptLineDist(this.coastline.get(k)) > tolerance)
 			{
 				return true;
 			}
@@ -268,36 +291,36 @@ public class CoastLine implements Iterable<Point2D>
 	}
 
 	/**************************************************************************
-	* Function: windowSmoothing(CoastLine cl, double radius)
+	* Function: windowSmoothing(double radius)
 	* This function takes a window radius and, for each point, recalculates its
 	* position based on the average position of all the points within the window.
 	*
 	* This was the first idea, but its slow, mildy effective and is not very
 	* good at reducing the point count.
 	**************************************************************************/
-	public static CoastLine windowSmoothing(CoastLine cl, double radius)
+	public CoastLine windowSmoothing(double radius)
 	{
 		CoastLine newCL = new CoastLine();
-		for (int i = 0; i < cl.getNumberOfPoints(); i++)
+		for (int i = 0; i < this.getNumberOfPoints(); i++)
 		{
 			int count = 1;
-			double sumX = cl.coastline.get(i).getX();
-			double sumY = cl.coastline.get(i).getY();
+			double sumX = this.coastline.get(i).getX();
+			double sumY = this.coastline.get(i).getY();
 
 			int j = 1;
-			while (i - j >= 0 && cl.coastline.get(i).distance(cl.coastline.get(i - j)) < radius)
+			while (i - j >= 0 && this.coastline.get(i).distance(this.coastline.get(i - j)) < radius)
 			{
-				sumX += cl.coastline.get(i - j).getX();
-				sumY += cl.coastline.get(i - j).getY();
+				sumX += this.coastline.get(i - j).getX();
+				sumY += this.coastline.get(i - j).getY();
 				count ++;
 				j++;
 			}
 
 			j = 1;
-			while (i + j < cl.getNumberOfPoints() && cl.coastline.get(i).distance(cl.coastline.get(i + j)) < radius)
+			while (i + j < this.getNumberOfPoints() && this.coastline.get(i).distance(this.coastline.get(i + j)) < radius)
 			{
-				sumX += cl.coastline.get(i + j).getX();
-				sumY += cl.coastline.get(i + j).getY();
+				sumX += this.coastline.get(i + j).getX();
+				sumY += this.coastline.get(i + j).getY();
 				count ++;
 				j++;
 			}
