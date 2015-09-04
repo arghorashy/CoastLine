@@ -8,6 +8,7 @@ public class CoastLineProcessor
 {
 	public static void main(String args[])
 	{
+		// User chooses between a demo and prompt
 		Scanner reader = new Scanner(System.in);
 		String cmd;
 		while(true)
@@ -19,17 +20,56 @@ public class CoastLineProcessor
 			else if (cmd.equals("prompt")) prompt();
 			else System.out.println("Invalid command!");
 		}
-		
-
 	}
 
 	public static void demo()
 	{
-		TestCoastLine cl = new TestCoastLine();
-		cl.draw(100 * 1000, 10);
-		//CoastLine newCL = cl.windowSmoothing(0.75);
-		CoastLine newCL = cl.subsample(0.5);
+		int num;
+		TestCoastLine cl = new TestCoastLine(0.001, 0.001);
+
+		System.out.println();
+
+		System.out.println("This is a demo of the coastline downsampling functionality.");
+		System.out.println("Throughout the demo, you will be prompted to press a key to");
+		System.out.println("move the demo forward.  You may interrupt the demo at any");
+		System.out.println("time by pressing ctrl+C.\n");
+		pressAnyKeyToContinue();
+
+		cl.draw();
+		num = cl.getNumberOfPoints();
+		System.out.println("Here is a detailed test coastline.  It is made up of ");
+		System.out.println(num + " points. Notice the piers along the coastline.\n");
+		pressAnyKeyToContinue();
+
+		cl.draw(220000, 50);
+
+		System.out.println("If we zoom in near one of the piers, it is clear that there");
+		System.out.println("is a high level of detail along the shoreline.\n");
+		pressAnyKeyToContinue();
+
+		System.out.println("If we just want to display a zoomed out version of this shoreline,");
+		System.out.println("it is not necessary to plot all " + num + " of the points.\n");
+		pressAnyKeyToContinue();
+
+		CoastLine newCL = cl.subsample(0.1);
+		num = newCL.getNumberOfPoints();
 		newCL.draw();
+		System.out.println("By subsampling the shoreline, the number of points can be reduced as");
+		System.out.println("much as 99%.  This plot only has " + num + " points with little effect on the");
+		System.out.println("zoomed out profile of the shoreline.\n");
+		pressAnyKeyToContinue();
+		
+		newCL.draw(760, 50);
+		System.out.println("Only when zoomed in does the difference become more apparent.\n");
+		pressAnyKeyToContinue();
+
+		CoastLine new2CL = cl.subsample(0.1);
+		num = new2CL.getNumberOfPoints();
+		new2CL.draw();
+		System.out.println("Further savings can be had by reapplying the algorithm. This plot only has");
+		System.out.println(num + " points.\n");
+		pressAnyKeyToContinue();
+
 	}
 
 	public static void prompt()
@@ -206,5 +246,15 @@ public class CoastLineProcessor
 		}
 
 		return sb.toString();
+	}
+
+	private static void pressAnyKeyToContinue()
+	{ 
+        System.out.println("Press any key to continue...");
+        try
+        {
+            System.in.read();
+        }  
+        catch(Exception e) {}  
 	}
 }
