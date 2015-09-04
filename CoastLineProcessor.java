@@ -9,9 +9,12 @@ public class CoastLineProcessor
 	{
 		TestCoastLine cl = new TestCoastLine();
 		cl.draw(100 * 1000, 10);
-		CoastLine newCL = CoastLine.windowSmoothing(cl, 0.75);
-		newCL.draw(100 * 1000, 10);
+		//CoastLine newCL = CoastLine.windowSmoothing(cl, 0.75);
+		CoastLine newCL = CoastLine.subsample(cl, 0.5);
+		newCL.draw();
 
 
 	}
+
+
 }

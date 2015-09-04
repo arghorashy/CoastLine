@@ -2,6 +2,7 @@ package coastline;
 
 import tools.*;
 import java.awt.geom.Point2D;
+import 	java.awt.geom.Line2D;
 import java.util.*;
 import java.awt.Point;
 
@@ -143,7 +144,42 @@ public class CoastLine implements Iterable<Point2D>
 			System.out.println(sumX / count);
 			newCL.add(new Point2D.Double(sumX / count, sumY / count));
 		}
+		return newCL;
+	}
 
+	public static CoastLine subsample(CoastLine cl, double accuracy)
+	{
+		CoastLine newCL = new CoastLine();
+		newCL.add(cl.coastline.get(0));
+		for (int i = 1; i < cl.getNumberOfPoints(); i++)
+		{
+			System.out.println(i);
+			int j = i + 1;
+			boolean outOfRange = false;
+			while (j < cl.getNumberOfPoints())
+			{
+				for (int k = i + 1; k < j; k++)
+				{
+					Line2D line = new Line2D.Double(cl.coastline.get(i), cl.coastline.get(j));
+					if (line.ptLineDist(cl.coastline.get(k)) > accuracy)
+					{
+						outOfRange = true;
+						break;	
+					}
+				}
+
+				if (outOfRange)
+				{
+					j --;
+					break;
+				}
+
+				if (j + 1 != cl.getNumberOfPoints()) j++;
+				else break;
+			}
+			i = j;
+			newCL.add(cl.coastline.get(j));
+		}
 		return newCL;
 
 	}
