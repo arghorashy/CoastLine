@@ -26,6 +26,11 @@ public class CoastLine implements Iterable<Point2D>
 		return this.coastline.size();
 	}
 
+	public void add(Point2D pt)
+	{
+		this.coastline.add(pt);
+	}
+
 	public void draw()
 	{
 		CoastLine.draw(this);
@@ -108,7 +113,40 @@ public class CoastLine implements Iterable<Point2D>
 		return i;
 	}
 
+	public static CoastLine windowSmoothing(CoastLine cl, double radius)
+	{
+		CoastLine newCL = new CoastLine();
+		for (int i = 0; i < cl.getNumberOfPoints(); i++)
+		{
+			int count = 1;
+			double sumX = cl.coastline.get(i).getX();
+			double sumY = cl.coastline.get(i).getY();
 
+			int j = 1;
+			while (i - j >= 0 && cl.coastline.get(i).distance(cl.coastline.get(i - j)) < radius)
+			{
+				sumX += cl.coastline.get(i - j).getX();
+				sumY += cl.coastline.get(i - j).getY();
+				count ++;
+				j++;
+			}
+
+			j = 1;
+			while (i + j < cl.getNumberOfPoints() && cl.coastline.get(i).distance(cl.coastline.get(i + j)) < radius)
+			{
+				sumX += cl.coastline.get(i + j).getX();
+				sumY += cl.coastline.get(i + j).getY();
+				count ++;
+				j++;
+			}
+
+			System.out.println(sumX / count);
+			newCL.add(new Point2D.Double(sumX / count, sumY / count));
+		}
+
+		return newCL;
+
+	}
 
 
 }
