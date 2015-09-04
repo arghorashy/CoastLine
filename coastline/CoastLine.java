@@ -203,8 +203,8 @@ public class CoastLine implements Iterable<Point2D>
 	* the approximate line will be far from the points that are being skipped.
 	*
 	* Therefore, to exclude the most number of points possible, it is
-	* necessary to find the point where the first condition goes from being
-	* satisified to unsastisifed.
+	* necessary to find the point (breaking point) where the first condition 
+	* goes from being satisified to unsastisifed.
 	*
 	* To find this breaking point, an exponential search is used, then a 
 	* binary search.
@@ -317,7 +317,8 @@ public class CoastLine implements Iterable<Point2D>
 			}
 
 			j = 1;
-			while (i + j < this.getNumberOfPoints() && this.coastline.get(i).distance(this.coastline.get(i + j)) < radius)
+			while (i + j < this.getNumberOfPoints() 
+				&& this.coastline.get(i).distance(this.coastline.get(i + j)) < radius)
 			{
 				sumX += this.coastline.get(i + j).getX();
 				sumY += this.coastline.get(i + j).getY();
