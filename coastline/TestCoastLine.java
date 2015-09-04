@@ -12,18 +12,34 @@ public class TestCoastLine extends CoastLine implements Iterable<Point2D>
 	{
 		List<Point2D> coastline = new ArrayList<Point2D>();
 
+		double resolution = 0.001;
+
 		// Create coarse coast
-		for (double x = 0; x <= 350; x += 0.001)
+		for (double x = 0; x <= 400; x += resolution)
 		{
 			coastline.add(new Point2D.Double(x, this.coarseCoastFunction(x)));
 		}
 
-		// Add a pier at x = 5
+		this.setCoastline(coastline);
+
+		// Add a pier at x = 200
+		int pierStartIndex = (int)(200 / resolution);
+		double pierWidth = 4;
+		double pierLength = 10;
+		this.addPier(resolution, pierStartIndex, pierWidth, pierLength);
+
+		pierStartIndex = (int)(100 / resolution);
+		this.addPier(resolution, pierStartIndex, pierWidth, pierLength);
+
+		pierStartIndex = (int)(325 / resolution);
+		this.addPier(resolution, pierStartIndex, pierWidth, pierLength);
+
+									// The pier will be 25 wide
 		//Point derivative = new Point();
 
 		// Add a protrusion
 
-		this.setCoastline(coastline);
+		
 	}
 
 	private double coarseCoastFunction(double x)
