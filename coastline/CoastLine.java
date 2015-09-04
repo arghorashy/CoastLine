@@ -156,37 +156,60 @@ public class CoastLine implements Iterable<Point2D>
 	{
 		CoastLine newCL = new CoastLine();
 		newCL.add(cl.coastline.get(0));
-		for (int i = 1; i < cl.getNumberOfPoints(); i++)
+		for (int i = 0; i < cl.getNumberOfPoints(); i++)
 		{
 			System.out.println(i);
-			int j = i + 1;
-			boolean outOfRange = false;
-			while (j < cl.getNumberOfPoints())
-			{
-				for (int k = i + 1; k < j; k++)
-				{
-					Line2D line = new Line2D.Double(cl.coastline.get(i), cl.coastline.get(j));
-					if (line.ptLineDist(cl.coastline.get(k)) > accuracy)
-					{
-						outOfRange = true;
-						break;	
-					}
-				}
 
-				if (outOfRange)
+			// Increase max exponentially to find breaking point quickly
+			int count = 1;
+			int max;
+			int min;
+			while(true)
+			{
+				max = i + (int)Math.pow(2, count);
+				min = i + (int)Math.pow(2, count - 1);
+				if (max >= cl.getNumberOfPoints()) 
 				{
-					j --;
+					max = cl.getNumberOfPoints() - 1;
 					break;
 				}
 
-				if (j + 1 != cl.getNumberOfPoints()) j++;
-				else break;
+				Line2D line = new Line2D.Double(cl.coastline.get(i), cl.coastline.get(max));
+				boolean outOfRange = CoastLine.arePointsInRange(cl, line, i + 1, max - 1, accuracy);
+
+				if (outOfRange) break;
+				else count ++;
 			}
-			i = j;
-			newCL.add(cl.coastline.get(j));
+
+			// Now, use binary search to find the breaking point
+			while (min < max)
+			{
+				int mid = (min + max) / 2;
+
+				Line2D line = new Line2D.Double(cl.coastline.get(i), cl.coastline.get(mid));
+				boolean outOfRange = CoastLine.arePointsInRange(cl, line, i + 1, mid - 1, accuracy);
+
+				if (outOfRange) max = mid - 1;
+				else min = mid + 1;
+			}
+
+			i = Math.min(min, max);
+			newCL.add(cl.coastline.get(i));
 		}
 		return newCL;
 
+	}
+
+	private static boolean arePointsInRange(CoastLine cl, Line2D line, int ptsStartInd, int ptsEndInd, double tolerance)
+	{
+		for (int k = ptsStartInd; k < ptsEndInd; k++)
+		{
+			if (line.ptLineDist(cl.coastline.get(k)) > tolerance)
+			{
+				return true;
+			}
+		}	
+		return false;
 	}
 
 
