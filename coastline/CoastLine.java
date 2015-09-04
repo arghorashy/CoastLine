@@ -17,6 +17,11 @@ public class CoastLine implements Iterable<Point2D>
 		this.coastline = new ArrayList<Point2D>(); 
 	}
 
+	public CoastLine(CoastLine cl)
+	{
+		this.coastline = cl.coastline;
+	}
+
 	public CoastLine(List<Point2D> cl)
 	{
 		this.coastline = cl;
