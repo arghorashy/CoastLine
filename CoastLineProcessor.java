@@ -74,9 +74,13 @@ public class CoastLineProcessor
 
 	public static void prompt()
 	{
+
+
 		Map<String, CoastLine> mem = new HashMap<String, CoastLine>();
 		mem.put("init", new TestCoastLine(0.001, 0.001));
 		Scanner reader = new Scanner(System.in);
+
+		showPromptHelp();
 
 		while (true)
 		{
@@ -246,6 +250,20 @@ public class CoastLineProcessor
 		}
 
 		return sb.toString();
+	}
+
+	private static void showPromptHelp()
+	{
+		System.out.println("");
+		System.out.println("Command Descriptions");
+		System.out.println("--------------------");
+		System.out.println("cp 		 - A coastline from one name in memory to another.");
+		System.out.println("function - Process a coastline in memory in-place.");
+		System.out.println("draw 	 - Draw a coastline in memory.");
+		System.out.println("show_mem - Show the coastlines currently in memory.");
+		System.out.println("           Always starts with \"init\" defined.");
+		System.out.println("exit 	 - Quit the program.");
+		System.out.println("");
 	}
 
 	private static void pressAnyKeyToContinue()
