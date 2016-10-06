@@ -1,3 +1,5 @@
+This program demonstrates an algorithm I developed to down-sample an over-sampled two-dimensional line (coastline) (i.e., reducing the amount of data required to store the line's shape) while minimising loss in detail.
+
 - I made a class called CoastLine.  You can import it into your own program and use it.
 - This class basically contains an ArrayList of points which defines a coastline.
 - The class can be constructed, point by point, with an ArrayList of points or with a 2D array of doubles (x, y).
